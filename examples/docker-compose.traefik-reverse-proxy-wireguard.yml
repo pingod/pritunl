@@ -42,8 +42,8 @@ services:
       - traefik.http.services.pritunl.loadbalancer.server.scheme=https
       - traefik.http.routers.pritunl.rule=Host(`admin.mydomain.com`)
       - traefik.http.routers.pritunl.tls=true
-      - "traefik.http.routers.pritunl.entrypoints=web-secure"
-      - "traefik.http.routers.pritunl.tls.certresolver=mytlschallenge"
+      - traefik.http.routers.pritunl.entrypoints=web-secure
+      - traefik.http.routers.pritunl.tls.certresolver=mytlschallenge
 
 
   traefik:
