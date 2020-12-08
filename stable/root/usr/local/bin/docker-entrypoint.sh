@@ -1,13 +1,16 @@
-
 #!/usr/bin/env bash
+
 # Init script for Pritunl Docker container
-SCRIPT_VERSION="1.0.2"
-# Last updated date: 2020-12-08
+# License: Apache-2.0
+# Github: https://github.com/goofball222/pritunl.git
+SCRIPT_VERSION="1.0.1"
+# Last updated date: 2018-08-22
 
 set -Eeuo pipefail
 
-if [ "${DEBUG}" == 'true' ];then
-  set -x
+if [ "${DEBUG}" == 'true' ];
+    then
+        set -x
 fi
 
 log() {
@@ -16,9 +19,9 @@ log() {
 
 log "INFO - Script version ${SCRIPT_VERSION}"
 
-
 PRITUNL=/usr/bin/pritunl
 PRITUNL_OPTS="${PRITUNL_OPTS}"
+
 FAKE_API_CHOICE='yes'
 
 # 用于替换官方产品购买的API接口为第三方接口
@@ -48,7 +51,6 @@ if [[ $FAKE_API_CHOICE == 'yes' ]];then
 elif [[ $FAKE_API_CHOICE == 'no' ]];then
   log "##################  Skiped Chang API Address  ##############"
 fi
-
 
 
 pritunl_setup() {
