@@ -5,8 +5,8 @@ services:
     image: mongo:latest
     container_name: pritunldb
     hostname: pritunldb
-    networks:
-      - private
+#    networks:
+#      - private
 #    volumes:
 #      - ./db:/data/db
 
@@ -17,9 +17,9 @@ services:
     privileged: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
-    networks:
-      - private
-      - proxy
+#    networks:
+#      - private
+#      - proxy
     links:
       - mongo
     volumes:
@@ -29,23 +29,25 @@ services:
       - 1194:1194/udp
       - 1195:1195/udp
     expose:
-      - 9700
+      - 443
     environment:
       - TZ=UTC
       - MONGODB_URI=mongodb://mongo:27017/pritunl
       - REVERSE_PROXY=true
       - WIREGUARD=true
     labels:
-      - traefik.port=443
-      - traefik.protocol=https
-      - traefik.docker.network=proxy
-      - traefik.backend=pritunl
-      - "traefik.http.routers.pritunl.rule=Host(`admin.mydomain.com`)"
+      - traefik.enable=true
+      - traefik.http.routers.pritunl.service=pritunl
+      - traefik.http.services.pritunl.loadbalancer.server.port=443
+      - traefik.http.services.pritunl.loadbalancer.server.scheme=https
+      - traefik.http.routers.pritunl.rule=Host(`admin.mydomain.com`)
+      - traefik.http.routers.pritunl.tls=true
       - "traefik.http.routers.pritunl.entrypoints=web-secure"
       - "traefik.http.routers.pritunl.tls.certresolver=mytlschallenge"
 
+
   traefik:
-    image: "traefik:v2.0"
+    image: "traefik:v2.3"
     container_name: traefik
     command:
       #- "--log.level=DEBUG"
@@ -55,6 +57,7 @@ services:
       - "--providers.docker.network=proxy"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web-secure.address=:443"
+      - "--serverstransport.insecureskipverify=true"
       - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
       - "--certificatesresolvers.mytlschallenge.acme.email=info@mydomain.com"
       - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
@@ -69,7 +72,7 @@ services:
       #Middleware
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
  
-      # global redirect to https
+      #global redirect to https
       - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.http-catchall.entrypoints=web"
       - "traefik.http.routers.http-catchall.middlewares=https-redirect"
@@ -81,11 +84,10 @@ services:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
-networks:
-  proxy:
-    external:
-      name: proxy
-  private:
-    driver: bridge
-    internal: true
-
+#networks:
+#  proxy:
+#    external:
+#      name: proxy
+#  private:
+#    driver: bridge
+#    internal: true
