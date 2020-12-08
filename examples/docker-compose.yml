@@ -10,7 +10,7 @@ services:
       - ./db:/data/db
 
   pritunl:
-    image: goofball222/pritunl:latest
+    image: registry.cn-hangzhou.aliyuncs.com/sourcegarden/pritunl
     container_name: pritunl
     hostname: pritunl
     network_mode: bridge
