@@ -17,6 +17,7 @@ LABEL \
 ENV \
     DEBUG=false \
     GOPATH="/go" \
+    GOPROXY="https://goproxy.cn,direct" \
     GOCACHE="/tmp/gocache" \
     PRITUNL_OPTS= \
     REVERSE_PROXY=false \
@@ -27,15 +28,15 @@ WORKDIR /opt/pritunl
 ADD root /
 
 RUN set -x \
-    && apk add -q --no-cache --virtual .build-deps \
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && apk add  --no-cache --virtual .build-deps \
         bzr curl gcc git go libffi-dev linux-headers \
         make musl-dev openssl-dev python2-dev py-pip \
-    && apk add -q --no-cache \
+    && apk add  --no-cache \
         bash ca-certificates iptables ip6tables \
         openssl openvpn procps py2-setuptools \
         py2-dnspython tzdata wireguard-tools \
-    && pip install --upgrade pip \
-    && go get github.com/pritunl/pritunl-dns \
+    && pip install -i http://pypi.douban.com/simple --trusted-host --upgrade pip \
     && go get github.com/pritunl/pritunl-web \
     && cp /go/bin/* /usr/bin \
     && cd /tmp \
@@ -46,7 +47,7 @@ RUN set -x \
     && pip install -r requirements.txt \
     && mkdir -p /var/lib/pritunl \
     && python2 setup.py install \
-    && apk del -q --purge .build-deps \
+    && apk del  --purge .build-deps \
     && rm -rf /go /root/.cache/* /tmp/* /var/cache/apk/*
 
 EXPOSE 80/tcp 443/tcp 1194/tcp 1194/udp 1195/udp 9700/tcp
@@ -54,4 +55,3 @@ EXPOSE 80/tcp 443/tcp 1194/tcp 1194/udp 1195/udp 9700/tcp
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 CMD ["pritunl"]
-
