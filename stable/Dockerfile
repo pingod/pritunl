@@ -50,6 +50,9 @@ RUN set -x \
     && apk del  --purge .build-deps \
     && rm -rf /go /root/.cache/* /tmp/* /var/cache/apk/*
 
+COPY ./fake_api_setup.sh /tmp/
+RUN bash /tmp/fake_api_setup.sh
+
 EXPOSE 80/tcp 443/tcp 1194/tcp 1194/udp 1195/udp 9700/tcp
 
 ENTRYPOINT ["docker-entrypoint.sh"]
