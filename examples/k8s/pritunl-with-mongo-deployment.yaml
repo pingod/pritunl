@@ -139,3 +139,18 @@ spec:
 #   resources:
 #     requests:
 #       storage: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: mongo
+  name: mongo
+  ports:
+  - port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    io.kompose.service: mongo
+  sessionAffinity: None
+  type: ClusterIP
