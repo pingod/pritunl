@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pritunl-link
+  namespace: kube-system
+  labels:
+    app: pritunl-link
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: pritunl-link
+  template:
+    metadata:
+      labels:
+        app: pritunl-link
+    spec:
+      containers:
+        - name: pritunl-link
+          image: docker.io/redavtovo/pritunl-link:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "200Mi"
+          envFrom:
+            - configMapRef:
+                name: pritunl-link-config
+          ports:
+            - containerPort: 500
+              protocol: UDP
+              hostPort: 500
+            - containerPort: 4500
+              protocol: UDP
+              hostPort: 4500
+          readinessProbe:
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            exec:
+              command:
+                - pritunl-link
+                - verify-off
+          securityContext:
+            # required for enable_ip_forwarding and ip tables
+            privileged: true

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [[ ! -z "$URL" ]]; then
+    pritunl-link add $URL
+    pritunl-link start
+else
+  echo "No URL provided. There is no server to connect to"
+fi
